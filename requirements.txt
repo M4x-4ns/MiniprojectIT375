@@ -1,0 +1,9 @@
+fastapi[standard]
+sqlalchemy
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+jinja2
+python-multipart
+pytest
+httpx
