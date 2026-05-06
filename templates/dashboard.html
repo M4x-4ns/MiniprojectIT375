@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Summary Cards -->
+<div class="grid grid-cols-3 gap-4 mb-6">
+  <div class="bg-green-50 border border-green-200 rounded-2xl p-5">
+    <p class="text-sm text-green-600 font-medium">รายรับทั้งหมด</p>
+    <p class="text-2xl font-bold text-green-700 mt-1">฿{{ "%.2f"|format(total_income) }}</p>
+  </div>
+  <div class="bg-red-50 border border-red-200 rounded-2xl p-5">
+    <p class="text-sm text-red-600 font-medium">รายจ่ายทั้งหมด</p>
+    <p class="text-2xl font-bold text-red-700 mt-1">฿{{ "%.2f"|format(total_expense) }}</p>
+  </div>
+  <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
+    <p class="text-sm text-indigo-600 font-medium">คงเหลือ</p>
+    <p class="text-2xl font-bold {% if balance >= 0 %}text-indigo-700{% else %}text-red-700{% endif %} mt-1">
+      ฿{{ "%.2f"|format(balance) }}
+    </p>
+  </div>
+</div>
+
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-xl font-bold text-slate-800">รายการของฉัน</h2>
+  <a href="/expenses/create"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+    + เพิ่มรายการ
+  </a>
+</div>
+
+<!-- Filter -->
+<div class="flex gap-2 mb-4">
+  {% for t, label in [("", "ทั้งหมด"), ("income", "รายรับ"), ("expense", "รายจ่าย")] %}
+  <a href="/?type={{ t }}"
+    class="px-3 py-1 rounded-full text-sm font-medium border transition
+      {% if type_filter == t %}bg-indigo-600 text-white border-indigo-600{% else %}bg-white text-slate-600 border-slate-300 hover:border-indigo-400{% endif %}">
+    {{ label }}
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Expense Table -->
+<div class="bg-white rounded-2xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
+      <tr>
+        <th class="px-6 py-3 text-left">วันที่</th>
+        <th class="px-6 py-3 text-left">รายการ</th>
+        <th class="px-6 py-3 text-left">หมวดหมู่</th>
+        <th class="px-6 py-3 text-left">ประเภท</th>
+        <th class="px-6 py-3 text-right">จำนวนเงิน</th>
+        <th class="px-6 py-3 text-left">จัดการ</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for expense in expenses %}
+      <tr class="hover:bg-slate-50 transition">
+        <td class="px-6 py-4 text-slate-500">{{ expense.date }}</td>
+        <td class="px-6 py-4 font-medium text-slate-800">{{ expense.title }}</td>
+        <td class="px-6 py-4 text-slate-500">{{ expense.category or "-" }}</td>
+        <td class="px-6 py-4">
+          {% if expense.type == "income" %}
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">รายรับ</span>
+          {% else %}
+            <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">รายจ่าย</span>
+          {% endif %}
+        </td>
+        <td class="px-6 py-4 text-right font-semibold {% if expense.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+          {{ "%.2f"|format(expense.amount) }}
+        </td>
+        <td class="px-6 py-4 flex gap-2">
+          <a href="/expenses/{{ expense.id }}/edit"
+            class="text-indigo-600 hover:underline text-xs font-medium">แก้ไข</a>
+          <form method="post" action="/expenses/{{ expense.id }}/delete"
+            onsubmit="return confirm('ลบรายการนี้?')">
+            <button class="text-red-500 hover:underline text-xs font-medium">ลบ</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+          ยังไม่มีรายการ — <a href="/expenses/create" class="text-indigo-600 hover:underline">เพิ่มเลย</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

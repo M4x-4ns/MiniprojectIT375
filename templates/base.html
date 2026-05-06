@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-60 bg-indigo-700 text-white flex flex-col min-h-screen fixed">
+    <div class="px-6 py-5 border-b border-indigo-600">
+      <h1 class="text-xl font-bold tracking-wide">Expense Tracker</h1>
+      {% if user %}
+      <p class="text-indigo-200 text-sm mt-1">{{ user.username }}</p>
+      {% endif %}
+    </div>
+    <nav class="flex-1 px-4 py-4 space-y-1">
+      {% if user %}
+        <a href="/" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600 transition text-sm font-medium">
+          ภาพรวม
+        </a>
+        <a href="/expenses/create" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600 transition text-sm font-medium">
+          + เพิ่มรายการ
+        </a>
+        {% if user.role == "admin" %}
+        <div class="pt-4 pb-1 px-3 text-xs text-indigo-300 uppercase tracking-wider">Admin</div>
+        <a href="/admin/users" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600 transition text-sm font-medium">
+          จัดการผู้ใช้
+        </a>
+        <a href="/admin/expenses" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600 transition text-sm font-medium">
+          รายการทั้งหมด
+        </a>
+        {% endif %}
+        <div class="absolute bottom-4 left-4 right-4">
+          <form method="post" action="/auth/logout">
+            <button class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-600 text-sm text-indigo-200">
+              ออกจากระบบ
+            </button>
+          </form>
+        </div>
+      {% endif %}
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="ml-60 flex-1 p-8">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>

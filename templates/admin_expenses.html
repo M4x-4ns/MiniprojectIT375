@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold text-slate-800 mb-6">รายการทั้งหมดในระบบ</h2>
+<div class="bg-white rounded-2xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
+      <tr>
+        <th class="px-6 py-3 text-left">วันที่</th>
+        <th class="px-6 py-3 text-left">รายการ</th>
+        <th class="px-6 py-3 text-left">เจ้าของ</th>
+        <th class="px-6 py-3 text-left">ประเภท</th>
+        <th class="px-6 py-3 text-left">หมวดหมู่</th>
+        <th class="px-6 py-3 text-right">จำนวนเงิน</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for expense in expenses %}
+      <tr class="hover:bg-slate-50 transition">
+        <td class="px-6 py-4 text-slate-500">{{ expense.date }}</td>
+        <td class="px-6 py-4 font-medium text-slate-800">{{ expense.title }}</td>
+        <td class="px-6 py-4 text-slate-500">{{ expense.owner.username }}</td>
+        <td class="px-6 py-4">
+          {% if expense.type == "income" %}
+            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">รายรับ</span>
+          {% else %}
+            <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">รายจ่าย</span>
+          {% endif %}
+        </td>
+        <td class="px-6 py-4 text-slate-500">{{ expense.category or "-" }}</td>
+        <td class="px-6 py-4 text-right font-semibold {% if expense.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+          {{ "%.2f"|format(expense.amount) }}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="px-6 py-10 text-center text-slate-400">ยังไม่มีรายการในระบบ</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
