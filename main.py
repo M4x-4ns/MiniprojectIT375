@@ -44,7 +44,7 @@ def get_current_user(request: Request, db: Session):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse(request, "login.html")
+    return templates.TemplateResponse("login.html", {"request": request})
 
 
 @app.post("/auth/login")
@@ -57,7 +57,7 @@ def login(
     user = db.query(models.User).filter(models.User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
         return templates.TemplateResponse(
-            request, "login.html", {"error": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
+            "login.html", {"request": request, "error": "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"}
         )
     token = create_access_token(user.id, user.role)
     response = RedirectResponse("/", status_code=303)
@@ -67,7 +67,7 @@ def login(
 
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
-    return templates.TemplateResponse(request, "register.html")
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 @app.post("/auth/register")
@@ -83,7 +83,7 @@ def register(
     ).first()
     if existing:
         return templates.TemplateResponse(
-            request, "register.html", {"error": "ชื่อผู้ใช้หรืออีเมลนี้มีอยู่แล้ว"}
+            "register.html", {"request": request, "error": "ชื่อผู้ใช้หรืออีเมลนี้มีอยู่แล้ว"}
         )
     user = models.User(
         username=username,
@@ -123,7 +123,8 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
         models.Expense.owner_id == current_user.id,
         models.Expense.type == "expense"
     ).all())
-    return templates.TemplateResponse(request, "dashboard.html", {
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
         "user": current_user,
         "expenses": expenses,
         "type_filter": type_filter,
@@ -138,8 +139,8 @@ def expense_create_page(request: Request, db: Session = Depends(get_db)):
     current_user = get_current_user(request, db)
     if not current_user:
         return RedirectResponse("/login", status_code=303)
-    return templates.TemplateResponse(request, "expense_form.html", {
-        "user": current_user, "expense": None
+    return templates.TemplateResponse("expense_form.html", {
+        "request": request, "user": current_user, "expense": None
     })
 
 
@@ -180,8 +181,8 @@ def expense_edit_page(expense_id: int, request: Request, db: Session = Depends(g
     expense = db.get(models.Expense, expense_id)
     if not expense or expense.owner_id != current_user.id:
         return RedirectResponse("/", status_code=303)
-    return templates.TemplateResponse(request, "expense_form.html", {
-        "user": current_user, "expense": expense
+    return templates.TemplateResponse("expense_form.html", {
+        "request": request, "user": current_user, "expense": expense
     })
 
 
@@ -234,8 +235,8 @@ def admin_users(request: Request, db: Session = Depends(get_db)):
     if not current_user or current_user.role != "admin":
         return RedirectResponse("/", status_code=303)
     users = db.query(models.User).order_by(models.User.created_at.desc()).all()
-    return templates.TemplateResponse(request, "admin_users.html", {
-        "user": current_user, "users": users
+    return templates.TemplateResponse("admin_users.html", {
+        "request": request, "user": current_user, "users": users
     })
 
 
@@ -259,6 +260,6 @@ def admin_expenses(request: Request, db: Session = Depends(get_db)):
     if not current_user or current_user.role != "admin":
         return RedirectResponse("/", status_code=303)
     expenses = db.query(models.Expense).order_by(models.Expense.date.desc()).all()
-    return templates.TemplateResponse(request, "admin_expenses.html", {
-        "user": current_user, "expenses": expenses
+    return templates.TemplateResponse("admin_expenses.html", {
+        "request": request, "user": current_user, "expenses": expenses
     })
