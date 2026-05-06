@@ -158,6 +158,11 @@ def expense_create(
     current_user = get_current_user(request, db)
     if not current_user:
         return RedirectResponse("/login", status_code=303)
+    if amount <= 0:
+        return templates.TemplateResponse("expense_form.html", {
+            "request": request, "user": current_user, "expense": None,
+            "error": "จำนวนเงินต้องมากกว่า 0"
+        })
     from datetime import date as date_type
     expense = models.Expense(
         title=title,
@@ -204,6 +209,11 @@ def expense_update(
     expense = db.get(models.Expense, expense_id)
     if not expense or expense.owner_id != current_user.id:
         return RedirectResponse("/", status_code=303)
+    if amount <= 0:
+        return templates.TemplateResponse("expense_form.html", {
+            "request": request, "user": current_user, "expense": expense,
+            "error": "จำนวนเงินต้องมากกว่า 0"
+        })
     from datetime import date as date_type
     expense.title = title
     expense.amount = amount
