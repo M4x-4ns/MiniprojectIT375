@@ -5,15 +5,5 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: expense-tracker-db
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
-
-databases:
-  - name: expense-tracker-db
-    databaseName: expensedb
-    user: expenseuser
-    plan: free
